@@ -1,0 +1,10 @@
+{
+    "dockerhub_username": ,
+    "dockerhub_password": ,
+    "dockerhub_repo": ,
+    "aws_key_name": ,
+    "aws_key_path": ,
+    "mongo_host": ,
+    "mongo_password": ,
+    "mongo_username":
+}

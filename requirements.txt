@@ -1,0 +1,11 @@
+Flask
+pandas
+numpy
+scipy
+pymongo[tls]
+Flask-CORS
+boto3
+seaborn
+matplotlib
+pvlib
+paramiko
