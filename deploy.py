@@ -325,6 +325,51 @@ def create_api_gateway():
     logging.info(f"API Gateway setup complete. Invoke URL: https://{api_id}.execute-api.{REGION}.amazonaws.com/prod")
 
 
+def delete_resources():
+    """
+    Delete specified EC2 instance and API Gateway.
+
+    Parameters:
+    - ec2_instance_name: Name tag of the EC2 instance to be deleted.
+    - api_gateway_name: Name of the API Gateway to be deleted.
+    """
+
+    # Initialize boto3 clients for EC2 and API Gateway
+    ec2_client = boto3.client('ec2')
+    apigateway_client = boto3.client('apigateway')
+
+    # Find and terminate EC2 instance by name
+    try:
+        response = ec2_client.describe_instances(
+            Filters=[
+                {
+                    'Name': 'tag:Name',
+                    'Values': [EC2_INSTANCE_NAME]
+                }
+            ]
+        )
+        if response['Reservations']:
+            instance_id = response['Reservations'][0]['Instances'][0]['InstanceId']
+            ec2_client.terminate_instances(InstanceIds=[instance_id])
+            print(f"EC2 instance with name {EC2_INSTANCE_NAME} (ID: {instance_id}) is being terminated.")
+        else:
+            print(f"No EC2 instance found with name {EC2_INSTANCE_NAME}.")
+    except Exception as e:
+        print(f"Error terminating EC2 instance with name {EC2_INSTANCE_NAME}: {e}")
+
+    # Find and delete API Gateway by name
+    try:
+        response = apigateway_client.get_rest_apis()
+        api_id = next((item['id'] for item in response['items'] if item["name"] == API_GATEWAY_NAME), None)
+        if api_id:
+            apigateway_client.delete_rest_api(restApiId=api_id)
+            print(f"API Gateway with name {API_GATEWAY_NAME} (ID: {api_id}) has been deleted.")
+        else:
+            print(f"No API Gateway found with name {API_GATEWAY_NAME}.")
+    except Exception as e:
+        print(f"Error deleting API Gateway with name {API_GATEWAY_NAME}: {e}")
+
+
 def main():
     logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -337,8 +382,15 @@ def main():
                         help="Port that service runs on.")
     parser.add_argument('--local', action='store_true',
                         help="Flag to determine if the script should run in a local environment. Default is False.")
+    parser.add_argument('--purge', action='store_true',
+                        help="Flag to delete and clean EC2 instance and API Gateway.")
 
     args = parser.parse_args()
+
+    if args.purge:
+        delete_resources()
+        exit(0)
+
     if args.local:
         db_host = args.mongo_host
         db_port = args.mongo_port
