@@ -61,6 +61,28 @@ The `deploy.py` script accepts the following properties through `config.json` fi
 | `mongo_password`     | The password used for authenticating to the MongoDB server or cluster.                            |
 | `mongo_username`     | The username used for authenticating to the MongoDB server or cluster.                            |
 
+### Making a Request and Understanding the Response
+##### Making a Request
+To retrieve the desired data, make a request to the appropriate endpoint of the deployed service. Depending on your deployment, this might be a local endpoint or a remote one provided by AWS or another cloud provider.
+```sh
+curl -X GET <YOUR_ENDPOINT_URL>
+```
+##### Response Format
+The response will be a JSON object containing the following fields:
+* timestamp: The timestamp indicating when the data was generated or retrieved.
+* heatmap: An image representing the heatmap, encoded as a Base64 string. You can decode this string to view or save the image.
+* surface-plot: An image representing the surface plot, also encoded as a Base64 string. Similarly, you can decode this string to view or save the image.
+
+##### Sample Response
+To view the images, you'll need to decode the Base64 strings. Many programming languages offer built-in methods for this, and there are also online tools available for decoding Base64.
+```json
+{
+    "timestamp": "2023-10-16T12:34:56Z",
+    "heatmap": "BASE64_ENCODED_STRING_FOR_HEATMAP_IMAGE",
+    "surface-plot": "BASE64_ENCODED_STRING_FOR_SURFACE_PLOT_IMAGE"
+}
+```
+
 
 ##### `deploy.py` Implementation Overview
 The `deploy.py` script automates the deployment process on AWS. Here's a brief description of the tasks carried out by the script:
@@ -79,5 +101,4 @@ The `deploy.py` script automates the deployment process on AWS. Here's a brief d
 3. ***`deploy.py`*** - Contains the logic for deploying the Docker image to Docker Hub. Sets up AWS EC2 instances and security groups. Configures and deploys the API Gateway on AWS.
 4. ***`Dockerfile`*** - Provides instructions for building the Docker image. Sets up the necessary environment variables and installs required dependencies.
 5. ***`requirements.txt`*** - Lists all the Python libraries and dependencies required for the project.
-6. ***`shadowingfunction_wallheight_13.py`*** - Contains the core logic for calculating shadows on a DSM.
-Uses mathematical calculations based on sun's azimuth and elevation to determine shadow matrices.
+6. ***`shadowingfunction_wallheight_13.py`*** - Contains the core logic for calculating shadows on a DSM. Uses mathematical calculations based on sun's azimuth and elevation to determine shadow matrices.
