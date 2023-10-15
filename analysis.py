@@ -1,7 +1,9 @@
 import base64
 import datetime
+import gzip
 import logging
 import os
+import pickle
 from datetime import datetime
 from io import BytesIO
 
@@ -94,13 +96,18 @@ def generate_surface_plot(shadow_matrix):
     return base64_encoded_image
 
 
+def compress_data(data):
+    compressed_data = gzip.compress(pickle.dumps(data))
+    return compressed_data
+
+
 @app.route('/calculate-shadow', methods=['GET'])
 def calculate_shadow():
     timestamp = datetime.now()
     shadow_matrix = calculate_shadow_matrix(timestamp)
 
     try:
-        save_shadow_matrix({'timestamp': timestamp, 'shadow_matrix': shadow_matrix.tolist()})
+        save_shadow_matrix({'timestamp': timestamp, 'shadow_matrix': compress_data(shadow_matrix)})
         logging.info("Shadow matrix saved successfully.")
     except Exception as e:
         logging.error(f"Failed to save shadow matrix to database. Error: {str(e)}")

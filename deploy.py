@@ -131,6 +131,16 @@ def check_or_create_ec2_instance(key_name, key_path, repo, security_group_id):
                     'ResourceType': 'instance',
                     'Tags': [{'Key': 'Name', 'Value': EC2_INSTANCE_NAME}]
                 }
+            ],
+            BlockDeviceMappings=[
+                {
+                    'DeviceName': '/dev/xvda',
+                    'Ebs': {
+                        'VolumeSize': 25,
+                        'VolumeType': 'gp2',
+                        'DeleteOnTermination': True
+                    }
+                }
             ]
         )
         instance_id = response['Instances'][0]['InstanceId']
@@ -405,7 +415,7 @@ def main():
                              configs['mongo_host'], configs['mongo_username'], configs['mongo_password'])
         check_or_create_ec2_instance(configs['aws_key_name'], configs['aws_key_path'], configs['dockerhub_repo'],
                                      security_group_id)
-        # create_api_gateway()
+        create_api_gateway()
         logging.info("Setup complete.")
 
 
